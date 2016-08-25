@@ -28,18 +28,18 @@ AnalogBot.maxSearchResults=20
 AnalogBot.ignoredUsers=
 
 # The string used to prefix any command to the bot.
-AnalogBot.CommentMonitor.callString=AnalogBotTest!
+AnalogBot.CommentMonitor.callString=AnalogBot!
 
 # List of subreddits that the bot should listen to for commands.
-AnalogBot.CommentMonitor.subredditsToMonitor=Analog,AnalogBot
+AnalogBot.CommentMonitor.subredditsToMonitor=
 
 # The subreddit that the weekly stats post should be posted to
-AnalogBot.WeeklyPost.subreddit=analog
+AnalogBot.WeeklyPost.subreddit=
 
 # The next date of the stats post, comment out to default to Next Monday
 #AnalogBot.WeeklyPost.nextWeeklyPost=
 
-# The time at which to gather the data for the weekly post
+# The [server] time at which to gather the data for the weekly post
 AnalogBot.WeeklyPost.dataGatheringTime=0000
 
 # Offset in milliseconds between data gathering time and post time.
