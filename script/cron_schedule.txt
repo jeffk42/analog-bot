@@ -1,0 +1,2 @@
+MAILTO=jeffk42@gmail.com
+0 0 * * * /usr/local/analog-bot/recyclebot.sh
