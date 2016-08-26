@@ -27,7 +27,7 @@ public class AnalogBotProperties extends Properties {
 	
 	protected AnalogBotProperties() {
 		try {
-			this.load(new FileInputStream(new File("./analogbot.properties")));
+			this.load(new FileInputStream(new File("analogbot.properties")));
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.SEVERE, "File Not Found while loading properties file.", e);
 		} catch (IOException e) {

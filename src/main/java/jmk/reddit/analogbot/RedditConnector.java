@@ -184,6 +184,17 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 					getScriptAppAuthentication();
 					
 				}
+				
+				// We just tried, but what if it fails?
+				if (!client.isAuthenticated())
+				{
+					// Wait a bit and try again.
+					try {
+						Thread.sleep(60000); // 1 minute sleep
+					} catch (InterruptedException e) {
+						LOG.log(Level.SEVERE, "Error during thread sleep.", e);
+					}
+				}
 			}
 			else 
 			{ // not time to reauth, but try anyway if there's a problem.
