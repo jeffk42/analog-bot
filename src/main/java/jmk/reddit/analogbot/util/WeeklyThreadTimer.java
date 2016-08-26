@@ -1,4 +1,4 @@
-package jmk.reddit.util;
+package jmk.reddit.analogbot.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;

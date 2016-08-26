@@ -1,4 +1,4 @@
-package jmk.reddit.util;
+package jmk.reddit.analogbot.util;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;

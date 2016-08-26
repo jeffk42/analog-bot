@@ -2,15 +2,14 @@ package jmk.reddit.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class AnalogBotBase {
+public abstract class UtilitiesProvider {
 	protected static final LogManager logManager = LogManager.getLogManager();
-	protected static final Logger LOG = Logger.getLogger(AnalogBotBase.class.getName());
-	protected static final AnalogBotProperties properties = AnalogBotProperties.getInstance();
-	protected static final AnalogBotUtilities utilities = AnalogBotUtilities.getInstance();
+	protected static final Logger LOG = Logger.getLogger(UtilitiesProvider.class.getName());
 
 	static
     {
@@ -22,16 +21,9 @@ public class AnalogBotBase {
 
     }
     
-    public AnalogBotBase() {
+    public UtilitiesProvider() {
 
     }
-    
-    /**
-	 * @return the properties
-	 */
-	public AnalogBotProperties getProperties() {
-		return properties;
-	}
 
 	/**
 	 * @return the logmanager
@@ -46,5 +38,7 @@ public class AnalogBotBase {
 	public static Logger getLog() {
 		return LOG;
 	}
+	
+	public abstract Properties getProperties();
 	
 }

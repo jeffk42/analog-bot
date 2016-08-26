@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import jmk.reddit.analogbot.parser.SubredditBannedParser;
 import jmk.reddit.analogbot.parser.SubredditTrafficParser;
-import jmk.reddit.util.AnalogBotBase;
+import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Listing;

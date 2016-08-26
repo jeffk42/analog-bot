@@ -12,8 +12,8 @@ import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jmk.reddit.util.AnalogBotBase;
-import jmk.reddit.util.WeeklyThreadTimer;
+import jmk.reddit.analogbot.util.AnalogBotBase;
+import jmk.reddit.analogbot.util.WeeklyThreadTimer;
 import net.dean.jraw.ApiException;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.managers.AccountManager;
