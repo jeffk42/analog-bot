@@ -85,6 +85,7 @@ public class MessageMonitor extends AnalogBotBase implements Runnable {
 				else
 				{
 					LOG.warning("Skipping a round due to authentication issues.");
+					utilities.changeConnectionState(false);
 				}
 			}
 			

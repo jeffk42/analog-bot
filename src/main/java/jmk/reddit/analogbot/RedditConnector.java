@@ -68,6 +68,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 			client.authenticate(authData);
 			LOG.info("Authenticated as: "+ client.getAuthenticatedUser());
 			updateLastAuthenticationDate();
+			utilities.changeConnectionState(true);
 		}
 
 		return client;
@@ -76,6 +77,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 	public void closeConnection() {
 		client.getOAuthHelper().revokeAccessToken(credentials);
 		client.deauthenticate();
+		utilities.changeConnectionState(false);
 	}
 	
 	public void updateLastAuthenticationDate() {
@@ -160,7 +162,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 	public void run() {
 		
 		while (true) {
-			// First, re-authenticate if authentication is expired.
+			// First, re-authenticate if authentication is expiring.
 			if (isTimeToReauthenticate())
 			{
 				synchronized(AnalogBot.class) {	
@@ -183,9 +185,15 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 					
 				}
 			}
-			else {
+			else 
+			{ // not time to reauth, but try anyway if there's a problem.
+				if (! client.isAuthenticated())
+				{
+					getScriptAppAuthentication();
+				}
+				
 				try {
-					Thread.sleep(60000 * 3);
+					Thread.sleep(60000 * 3); // 3 minute sleep
 				} catch (InterruptedException e) {
 					LOG.log(Level.SEVERE, "Error during thread sleep.", e);
 				}

@@ -10,6 +10,7 @@ public class AnalogBotBase {
 	protected static final LogManager logManager = LogManager.getLogManager();
 	protected static final Logger LOG = Logger.getLogger(AnalogBotBase.class.getName());
 	protected static final AnalogBotProperties properties = AnalogBotProperties.getInstance();
+	protected static final AnalogBotUtilities utilities = AnalogBotUtilities.getInstance();
 
 	static
     {
@@ -45,4 +46,5 @@ public class AnalogBotBase {
 	public static Logger getLog() {
 		return LOG;
 	}
+	
 }

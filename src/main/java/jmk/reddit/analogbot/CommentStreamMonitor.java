@@ -100,6 +100,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 			{
 				if (client.isAuthenticated())
 				{
+					
 					// Get the new comment stream
 					commentStream.reset();
 					
@@ -111,6 +112,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 							pageList = commentStream.next();
 						} catch (NetworkException ne) {
 							LOG.log(Level.SEVERE, "Re-authentication failed. Skipping this round, will try again.", ne);
+							utilities.changeConnectionState(false);
 							continue;
 						}
 						
@@ -156,6 +158,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 				else
 				{
 					LOG.info("Skipping a round due to authentication issues.");
+					utilities.changeConnectionState(false);
 				}
 			
 			}
