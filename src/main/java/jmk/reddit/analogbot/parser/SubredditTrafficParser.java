@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import jmk.reddit.analogbot.RedditConnector;
 import jmk.reddit.analogbot.parser.node.TrafficNode;
+import jmk.reddit.util.RedditConnector;
 
 /**
  * @author jkraus

@@ -1,15 +1,14 @@
-package jmk.reddit.weeklystats;
+package jmk.reddit.weeklystats.util;
 
 import java.util.logging.Logger;
 
 import jmk.reddit.util.UtilitiesProvider;
-import jmk.reddit.weeklystats.util.WeeklyStatsProperties;
 
-public class StatUtilsProvider extends UtilitiesProvider {
-	protected static final Logger LOG = Logger.getLogger(StatUtilsProvider.class.getName());
+public class WeeklyStatsBase extends UtilitiesProvider {
+	protected static final Logger LOG = Logger.getLogger(WeeklyStatsBase.class.getName());
 	protected static final WeeklyStatsProperties properties = WeeklyStatsProperties.getInstance();
     
-    public StatUtilsProvider() {
+    public WeeklyStatsBase() {
 
     }
     

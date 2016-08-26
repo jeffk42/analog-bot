@@ -1,10 +1,8 @@
 package jmk.reddit.analogbot.util;
 
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import jmk.reddit.util.UtilitiesProvider;
-import jmk.reddit.weeklystats.StatUtilsProvider;
 
 public class AnalogBotBase extends UtilitiesProvider {
 

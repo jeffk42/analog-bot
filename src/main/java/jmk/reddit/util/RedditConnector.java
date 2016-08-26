@@ -1,11 +1,12 @@
 /**
  * 
  */
-package jmk.reddit.analogbot;
+package jmk.reddit.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jmk.reddit.analogbot.AnalogBot;
 import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
@@ -32,7 +33,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 	
 	private RedditConnector() {
 
-		myUserAgent = UserAgent.of("desktop", "jmk.reddit.AnalogBot", "v0.2", properties.getProperty("AnalogBot.username"));
+		myUserAgent = UserAgent.of("desktop", "jmk.reddit.AnalogBot", "v0.6", properties.getProperty("AnalogBot.username"));
 		client = new RedditClient(myUserAgent);
 		credentials = Credentials.script(
 				properties.getProperty("AnalogBot.username"), 
