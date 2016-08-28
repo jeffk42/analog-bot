@@ -1,49 +1,61 @@
 ### Credentials ###
-AnalogBot.username=***
-AnalogBot.password=***
-AnalogBot.appId=***
-AnalogBot.secret=***
+AnalogBot.username=
+AnalogBot.password=
+AnalogBot.appId=
+AnalogBot.secret=
 
 ### Preferences ###
 
-# enable comment monitoring threads for the subreddits listed in subredditsToMonitor
+### enable comment monitoring threads for the subreddits listed in subredditsToMonitor ###
 AnalogBot.enableCommentMonitor=false
 
-# enable the thread that monitors the account's messages for private commands.
+### enable the thread that monitors the account's messages for private commands. ###
 AnalogBot.enableMessageMonitor=false
 
-# enables the thread that posts the weekly post.
+### enables the thread that posts the weekly post. ###
 AnalogBot.enableWeeklyPost=false
 
-# currently unused, leave it in for testing.
-AnalogBot.testMode=false
+### Test Mode may change certain things (like remove /u/ from usernames so users aren't notified every time a test post is made) ###
+AnalogBot.testMode=true
 
-# Number of results to return when user requests a search but doesn't specify count
+### Number of results to return when user requests a search but doesn't specify count ###
 AnalogBot.defaultSearchResults=5
 
-# Max Number of results to return when user requests a search
+### Max Number of results to return when user requests a search ###
 AnalogBot.maxSearchResults=20
 
-# The bot will not respond to any requests by users listed here.
+### The bot will not respond to any requests by users listed here. ###
 AnalogBot.ignoredUsers=
 
-# The string used to prefix any command to the bot.
-AnalogBot.CommentMonitor.callString=AnalogBot!
+### The string used to prefix any command to the bot. ###
+AnalogBot.CommentMonitor.callString=
 
-# List of subreddits that the bot should listen to for commands.
+### List of subreddits that the bot should listen to for commands. ###
 AnalogBot.CommentMonitor.subredditsToMonitor=
 
-# The subreddit that the weekly stats post should be posted to
+### The subreddit that the weekly stats post should be posted to ###
 AnalogBot.WeeklyPost.subreddit=
 
-# The next date of the stats post, comment out to default to Next Monday
+### The next date of the stats post, comment out to default to Next Monday ###
 #AnalogBot.WeeklyPost.nextWeeklyPost=
 
-# The [server] time at which to gather the data for the weekly post
+### The time at which to gather the data for the weekly post ###
 AnalogBot.WeeklyPost.dataGatheringTime=0000
 
-# Offset in milliseconds between data gathering time and post time.
+### Offset in milliseconds between data gathering time and post time. ###
 AnalogBot.WeeklyPost.postSubmissionOffset=14400000
+
+### Weekly Stats Inexplicable Search Offset ###
+# Not sure why, but the search results are always skewed by 8 hours
+# when using the cloudsearch timestamp range regardless of time zone.
+# (for example, searching the last 24 hours would actually return results
+# between 32 and 8 hours ago, but nothing in the last 8 hours).
+# If this is ever fixed, this value can be set to zero.
+AnalogBot.WeeklyPost.searchTimeOffset=8
+
+### Weekly Stats Filename ###
+AnalogBot.WeeklyPost.outputFileName=./stats/weeklystats.txt
+
 
 ### Meaningless Drivel ###
 AnalogBot.adjectives=stinky,fun,round,local,portly,dull,rare,awful,slippery,funky,brown,angry

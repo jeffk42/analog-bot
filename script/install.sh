@@ -41,6 +41,7 @@ echo Copy files...
 cp -v script/startbot.sh $installdir
 cp -v script/killbot.sh $installdir
 cp -v script/recyclebot.sh $installdir
+cp -v script/buildstats.sh $installdir
 
 #propdir=$installdir/properties
 #mkdir -v $propdir
