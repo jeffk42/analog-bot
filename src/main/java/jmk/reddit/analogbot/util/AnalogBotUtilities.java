@@ -5,10 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class AnalogBotUtilities {
+public class AnalogBotUtilities extends AnalogBotBase {
 
 	private static AnalogBotUtilities utils = null;
+	protected static final Logger LOG = Logger.getLogger(AnalogBotUtilities.class.getName());
 	
 	public static synchronized AnalogBotUtilities getInstance() {
 		if (utils == null)
@@ -36,11 +39,9 @@ public class AnalogBotUtilities {
 			
 			os.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "There was a problem accessing the state file.", e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "There was a problem accessing the state file.", e);
 		}
 	}
 }

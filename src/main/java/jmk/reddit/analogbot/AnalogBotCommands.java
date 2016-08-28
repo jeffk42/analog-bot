@@ -28,18 +28,18 @@ import net.dean.jraw.paginators.TimePeriod;
 
 public class AnalogBotCommands extends AnalogBotBase {
 	
-	private String GET_PHOTOS_REGEX = "^((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
-	private String GET_PHOTOS_MSG_REGEX = ".*((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
-	private String WEEKLY_STATS_REGEX = "^.*weekly[ ]?(stats|statistics).*$";
-	private String PERSONAL_STATS_REGEX = "^.*personal[ ]?(stats|statistics).*$";
+	private static final  String GET_PHOTOS_REGEX = "^((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
+	private static final  String GET_PHOTOS_MSG_REGEX = ".*((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
+	private static final  String WEEKLY_STATS_REGEX = "^.*weekly[ ]?(stats|statistics).*$";
+	private static final  String PERSONAL_STATS_REGEX = "^.*personal[ ]?(stats|statistics).*$";
 	
-	private String ae1Regex = ".*[Aa][Ee]-?1.*";
-	private String portraRegex = ".*[Pp][Oo][Rr][Tt][Rr][Aa].*";
-	private String ektarRegex = ".*[Ee][Kk][Tt][Aa][Rr].*";
-	private String tmaxRegex = ".*[Tt]-?[Mm][Aa][Xx].*";
-	private String ilfordRegex = ".*([Dd][Ee][Ll][Tt][Aa]|[Hh][Pp]5|[Ff][Pp]4|[Ii][Ll][Ff][Oo][Rr][Dd]|[Pp][Aa][Nn][ ]?[Ff]).*";
+	public static final  String ae1Regex = ".*[Aa][Ee]-?1.*";
+	public static final  String portraRegex = ".*[Pp][Oo][Rr][Tt][Rr][Aa].*";
+	public static final  String ektarRegex = ".*[Ee][Kk][Tt][Aa][Rr].*";
+	public static final  String tmaxRegex = ".*[Tt]-?[Mm][Aa][Xx].*";
+	public static final String ilfordRegex = ".*([Dd][Ee][Ll][Tt][Aa]|[Hh][Pp]5|[Ff][Pp]4|[Ii][Ll][Ff][Oo][Rr][Dd]|[Pp][Aa][Nn][ ]?[Ff]).*";
 
-	private DecimalFormat percFormat = new DecimalFormat("#.#");
+	public DecimalFormat percFormat = new DecimalFormat("#.#");
 	
 	//private RedditClient client = null;
 	private static AnalogBotCommands instance = null;

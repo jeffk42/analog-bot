@@ -28,7 +28,7 @@ public class WeeklyStatsProperties extends Properties {
 	
 	protected WeeklyStatsProperties() {
 		try {
-			this.load(new FileInputStream(new File("weeklystats.properties")));
+			this.load(new FileInputStream(new File("analogbot.properties")));
 		} catch (FileNotFoundException e) {
 			LOG.log(Level.SEVERE, "File Not Found while loading properties file.", e);
 		} catch (IOException e) {

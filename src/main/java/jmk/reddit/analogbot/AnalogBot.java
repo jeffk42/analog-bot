@@ -47,7 +47,7 @@ public class AnalogBot extends AnalogBotBase {
 			COMMENT_LISTENER_REGEX = "(^|.*[ ]+)("+ callProp +")\\W*(.*)$.*";
 		
 		// initial authentication is outside of the thread to avoid concurrency issues.
-		RedditConnector.getInstance().getScriptAppAuthentication();
+		RedditConnector.getInstance().getScriptAppAuthentication(true);
 		
 		// now start the thread to reauthorize as necessary.
 		startAuthenticationListenerThread();
@@ -55,7 +55,7 @@ public class AnalogBot extends AnalogBotBase {
 
 		account = new AccountManager(RedditConnector.getInstance().getClient());
 		inbox = new InboxManager(RedditConnector.getInstance().getClient());
-		commandUtil = new AnalogBotCommands();
+		commandUtil = AnalogBotCommands.getInstance();
 	
 		// spawn threads for each of the primary functions
 		startCommentListenerThreads();
@@ -279,7 +279,7 @@ public class AnalogBot extends AnalogBotBase {
             public void run()
             {
                 LOG.info("Signal Received. Attempting graceful exit.");
-                RedditConnector.getInstance().closeConnection();
+                RedditConnector.getInstance().closeConnection(true);
                 LOG.info("Connection closed.");
             }
         });
