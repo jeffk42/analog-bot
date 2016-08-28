@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Starting the AnalogBot installer..."
 
-jarfile="analog-bot-0.5.0-jar-with-dependencies.jar"
+jarfile="analog-bot-0.6.0-jar-with-dependencies.jar"
 currentdir=${BASH_SOURCE%/*}
 
 echo Current directory is $currentdir

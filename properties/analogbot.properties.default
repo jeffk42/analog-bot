@@ -13,6 +13,7 @@ AnalogBot.enableCommentMonitor=false
 AnalogBot.enableMessageMonitor=false
 
 ### enables the thread that posts the weekly post. ###
+# Note: this does not affect direct calls to the WeeklyStatisticsGenerator, only if you choose to let AnalogBot handle it. #
 AnalogBot.enableWeeklyPost=false
 
 ### Test Mode may change certain things (like remove /u/ from usernames so users aren't notified every time a test post is made) ###

@@ -122,7 +122,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = "";
             while((line = bufferedReader.readLine()) != null) {
-                post += line;
+                post += line + "\n";
             }   
 
             // Always close files.
