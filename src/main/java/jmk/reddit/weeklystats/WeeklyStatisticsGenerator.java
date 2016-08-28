@@ -1,7 +1,9 @@
 package jmk.reddit.weeklystats;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -85,10 +87,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 			try {
 				OutputStream osTime = new BufferedOutputStream(
 				        new FileOutputStream(outputFile));
-				
-//				long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
-//				long toTime = (System.currentTimeMillis() / 1000) + (searchTimeOffset * HOUR_SECONDS);
-//				long fromTime = toTime - WEEK_SECONDS;
+
 				
 				String weeklyPostString = getWeeklyStats(
 						properties.getProperty("AnalogBot.WeeklyPost.subreddit"),
@@ -114,7 +113,26 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	
 	public void postStatsFromFile()
 	{
+		String inputFile = properties.getProperty("AnalogBot.WeeklyPost.outputFileName");
+		String post = "";
+		try {
+			FileReader fileReader = new FileReader(inputFile);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line = "";
+            while((line = bufferedReader.readLine()) != null) {
+                post += line;
+            }   
+
+            // Always close files.
+            bufferedReader.close();         
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
+		System.out.println(post);
 	}
 	
 	/**
