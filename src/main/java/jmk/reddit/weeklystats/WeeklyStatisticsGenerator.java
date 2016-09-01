@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,28 +48,107 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	
 	public DecimalFormat percFormat = new DecimalFormat("#.#");
 	
-	public WeeklyStatisticsGenerator() {
+//	public WeeklyStatisticsGenerator() {
+//		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
+//		long toTime = (System.currentTimeMillis() / 1000) + (searchTimeOffset * HOUR_SECONDS);
+//		long fromTime = toTime - WEEK_SECONDS;
+//		generateStatsFile(fromTime, toTime);
+//	}
+	
+	public WeeklyStatisticsGenerator(String [] args)
+	{		
 		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
-		long toTime = (System.currentTimeMillis() / 1000) + (searchTimeOffset * HOUR_SECONDS);
-		long fromTime = toTime - WEEK_SECONDS;
-		generateStatsFile(fromTime, toTime);
+		
+		if (args.length > 0)
+		{
+			if (args[0].equalsIgnoreCase("WeekEnding"))
+			{
+				if (args.length > 1)
+				{
+					int month = Integer.parseInt(args[1].substring(0,2));
+					int day = Integer.parseInt(args[1].substring(2,4));
+					int year = Integer.parseInt(args[1].substring(4));
+					
+					Calendar calEnd = Calendar.getInstance();
+					calEnd.set(2000 + year, month-1, day, 23, 59, 59);
+					calEnd.setTimeZone(TimeZone.getTimeZone("GMT"));
+					
+					Calendar calStart = Calendar.getInstance();
+					calStart.setTime(calEnd.getTime());
+					calStart.setTimeZone(TimeZone.getTimeZone("GMT"));
+					
+					calStart.add(Calendar.DAY_OF_MONTH, -6);
+					calStart.set(Calendar.HOUR_OF_DAY, 00);
+					calStart.set(Calendar.MINUTE, 00);
+					calStart.set(Calendar.SECOND, 00);
+					
+					LOG.log(Level.INFO, "Generating statistics from "+calStart.getTime().toString()+" to "+
+					calEnd.getTime().toString()+ "...");
+					
+					long fromTime = calStart.getTimeInMillis() / 1000;
+					long toTime = calEnd.getTimeInMillis() / 1000;
+					
+					fromTime += (searchTimeOffset * HOUR_SECONDS);
+					toTime += (searchTimeOffset * HOUR_SECONDS);
+					
+					generateStatsFile(fromTime, toTime);
+					
+					if (args.length > 2)
+					{
+						if (args[2].equalsIgnoreCase("BuildAndPostStats"))
+						{
+							postStatsFromFile();
+						}
+					}
+					
+					
+				}
+				else LOG.log(Level.SEVERE, "WeekEnding Requires a date in MMDDYY format and a processing command to continue.");
+			}
+			else if (args[0].equalsIgnoreCase("TimeRange"))
+			{
+				if (args.length > 2)
+				{
+					long fromTime = Long.parseLong(args[1]);
+					long toTime = Long.parseLong(args[2]);
+					
+					fromTime += (searchTimeOffset * HOUR_SECONDS);
+					toTime += (searchTimeOffset * HOUR_SECONDS);
+					
+					generateStatsFile(fromTime, toTime);
+					
+					if (args.length > 3)
+					{
+						if (args[3].equalsIgnoreCase("BuildAndPostStats"))
+						{
+							postStatsFromFile();
+						}
+					}
+				}
+			}
+			else if (args[0].equalsIgnoreCase("PostStats"))
+			{
+				postStatsFromFile();
+			}
+		}
+	
 	}
 	
-	public WeeklyStatisticsGenerator(String command, long fromTime, long toTime) {
-		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
-		fromTime += (searchTimeOffset * HOUR_SECONDS);
-		toTime += (searchTimeOffset * HOUR_SECONDS);
-		
-		if (command.equalsIgnoreCase("BuildStats"))
-			generateStatsFile(fromTime, toTime);
-		else if (command.equalsIgnoreCase("PostStats"))
-			postStatsFromFile();
-		else if (command.equalsIgnoreCase("BuildAndPostStats"))
-		{
-			generateStatsFile(fromTime, toTime);
-			postStatsFromFile();
-		}
-	}
+//	public WeeklyStatisticsGenerator(String command, long fromTime, long toTime) {
+//		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
+//		fromTime += (searchTimeOffset * HOUR_SECONDS);
+//		toTime += (searchTimeOffset * HOUR_SECONDS);
+//		
+//		if (command.equalsIgnoreCase("BuildStats"))
+//			generateStatsFile(fromTime, toTime);
+//		else if (command.equalsIgnoreCase("PostStats"))
+//			postStatsFromFile();
+//		else if (command.equalsIgnoreCase("BuildAndPostStats"))
+//		{
+//			generateStatsFile(fromTime, toTime);
+//			postStatsFromFile();
+//		}
+//	}
 	
 	public void generateStatsFile(long fromTime, long toTime) {
 		
@@ -78,16 +158,24 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		{			
 			
 			Calendar weekEnding = Calendar.getInstance();
-			weekEnding.add(Calendar.DATE, -1);
+			weekEnding.setTimeInMillis(toTime * 1000);
+			
+			
 			SimpleDateFormat dt1 = new SimpleDateFormat("dd MMM yyyy");
+			
+			String titleStr = "Weekly Stats For /r/"+
+					properties.getProperty("AnalogBot.WeeklyPost.subreddit")+
+					", Week Ending "+dt1.format(weekEnding.getTime())+ "\n";
 			
 			// (and timestamp:1373932800..1474019200 title:'something')
 			
 			String outputFile = properties.getProperty("AnalogBot.WeeklyPost.outputFileName");
+			
 			try {
 				OutputStream osTime = new BufferedOutputStream(
 				        new FileOutputStream(outputFile));
-
+				
+				osTime.write(titleStr.getBytes());
 				
 				String weeklyPostString = getWeeklyStats(
 						properties.getProperty("AnalogBot.WeeklyPost.subreddit"),
@@ -101,9 +189,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 				ex.printStackTrace();
 			}
 			
-//			selfPost("Weekly Stats For /r/"+ properties.getProperty("AnalogBot.WeeklyPost.subreddit") +
-//					", Week Ending " + dt1.format(weekEnding.getTime()), postContent, 
-//					properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
+
 		}
 		else
 		{
@@ -130,9 +216,11 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
+		}	
 		
-		System.out.println(post);
+//		selfPost("Weekly Stats For /r/"+ properties.getProperty("AnalogBot.WeeklyPost.subreddit") +
+//		", Week Ending " + dt1.format(weekEnding.getTime()), postContent, 
+//		properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
 	}
 	
 	/**
@@ -545,28 +633,6 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	 */
 	public static void main(String[] args) {
 		
-		System.out.println("executing with "+args.length + " arguments:");
-		
-		String command = "";
-		long endBound = -1;
-		long daysBack = -1;
-		
-		if (args.length > 0)
-			command = args[0];
-		if (args.length > 1)
-			endBound = Long.parseLong(args[1]);
-		if (args.length > 2)
-			daysBack = Long.parseLong(args[2]);
-		long startBound = -1;
-		
-		if (daysBack > 0)
-			startBound = endBound - (daysBack * DAY_SECONDS);
-		
-//		if (!command.isEmpty())
-//		{
-//			
-//		}
-		
 		Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
@@ -578,10 +644,33 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
             }
         });
 		
-		if (args.length == 0)
-			new WeeklyStatisticsGenerator();
-		else
-			new WeeklyStatisticsGenerator(command, startBound, endBound);
+		new WeeklyStatisticsGenerator(args);
+		
+//		if (args.length == 0)
+//			new WeeklyStatisticsGenerator();
+//		else if (args.length == 3 && args[0].startsWith("WeekEnding"))
+//		{
+//			
+//			new WeeklyStatisticsGenerator(args);
+//		}
+//		else
+//		{
+//			String command = "";
+//			long endBound = -1;
+//			long daysBack = -1;
+//			
+//			if (args.length > 0)
+//				command = args[0];
+//			if (args.length > 1)
+//				endBound = Long.parseLong(args[1]);
+//			if (args.length > 2)
+//				daysBack = Long.parseLong(args[2]);
+//			long startBound = -1;
+//			
+//			if (daysBack > 0)
+//				startBound = endBound - (daysBack * DAY_SECONDS);
+//			new WeeklyStatisticsGenerator(command, startBound, endBound);
+//		}
 		
 	}
 }
