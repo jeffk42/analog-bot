@@ -65,6 +65,8 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 			{
 				if (args.length > 1)
 				{
+					// argument should be in the format mmddyy
+					// ie, bash comand `date -j +%m%d%y`
 					int month = Integer.parseInt(args[1].substring(0,2));
 					int day = Integer.parseInt(args[1].substring(2,4));
 					int year = Integer.parseInt(args[1].substring(4));
@@ -201,12 +203,21 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	{
 		String inputFile = properties.getProperty("AnalogBot.WeeklyPost.outputFileName");
 		String post = "";
+		String title = "";
+		
 		try {
+			
 			FileReader fileReader = new FileReader(inputFile);
 
             // Always wrap FileReader in BufferedReader.
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line = "";
+            
+            
+            // First line is the post title.
+            if ((line = bufferedReader.readLine()) != null)
+            	title = line;
+            	
             while((line = bufferedReader.readLine()) != null) {
                 post += line + "\n";
             }   
@@ -217,10 +228,8 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}	
-		
-//		selfPost("Weekly Stats For /r/"+ properties.getProperty("AnalogBot.WeeklyPost.subreddit") +
-//		", Week Ending " + dt1.format(weekEnding.getTime()), postContent, 
-//		properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
+		LOG.log(Level.INFO, "Post Title: "+title+"\n\n"+post);
+		selfPost(title, post, properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
 	}
 	
 	/**
@@ -231,6 +240,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	 * @param subreddit
 	 */
 	public void selfPost(String title, String postContent, String subreddit) {
+		
 		AccountManager.SubmissionBuilder builder = new AccountManager.SubmissionBuilder(postContent, subreddit, title);
 		RedditClient client = RedditConnector.getInstance().getClient();
 		AccountManager account = new AccountManager(client);
@@ -243,7 +253,6 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		} catch (ApiException e) {
 			LOG.log(Level.SEVERE, "ApiException when posting weekly thread", e);
 		}
-		
 		
 	}
 	
