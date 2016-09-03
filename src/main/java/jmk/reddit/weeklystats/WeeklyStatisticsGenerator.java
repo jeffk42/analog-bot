@@ -228,7 +228,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}	
-		LOG.log(Level.INFO, "Post Title: "+title+"\n\n"+post);
+		LOG.log(Level.INFO, "Posting: "+title);
 		selfPost(title, post, properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
 	}
 	
