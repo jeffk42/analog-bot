@@ -1,12 +1,13 @@
 /**
  * 
  */
-package jmk.reddit.analogbot;
+package jmk.reddit.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jmk.reddit.util.AnalogBotBase;
+import jmk.reddit.analogbot.AnalogBot;
+import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.http.UserAgent;
@@ -32,7 +33,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 	
 	private RedditConnector() {
 
-		myUserAgent = UserAgent.of("desktop", "jmk.reddit.AnalogBot", "v0.2", properties.getProperty("AnalogBot.username"));
+		myUserAgent = UserAgent.of("desktop", "jmk.reddit.AnalogBot", "v0.6", properties.getProperty("AnalogBot.username"));
 		client = new RedditClient(myUserAgent);
 		credentials = Credentials.script(
 				properties.getProperty("AnalogBot.username"), 
@@ -51,7 +52,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 		return instance;
 	}
 	
-	public RedditClient getScriptAppAuthentication() {
+	public RedditClient getScriptAppAuthentication(boolean updateState) {
 		// authenticate with Reddit before doing anything.
 		
 		OAuthData authData = null;
@@ -74,7 +75,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 		return client;
 	}
 	
-	public void closeConnection() {
+	public void closeConnection(boolean updateState) {
 		client.getOAuthHelper().revokeAccessToken(credentials);
 		client.deauthenticate();
 		utilities.changeConnectionState(false);
@@ -169,7 +170,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 					
 					if (client.isAuthenticated())
 					{
-						closeConnection();
+						closeConnection(true);
 						
 						try {
 							Thread.sleep(5000);
@@ -181,13 +182,14 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 					else
 						LOG.info("No authentication present. Attempting to authenticate.");
 
-					getScriptAppAuthentication();
+					getScriptAppAuthentication(true);
 					
 				}
 				
 				// We just tried, but what if it fails?
 				if (!client.isAuthenticated())
 				{
+					LOG.log(Level.WARNING, "Authentication failed. Trying again in one minute.");
 					// Wait a bit and try again.
 					try {
 						Thread.sleep(60000); // 1 minute sleep
@@ -200,7 +202,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 			{ // not time to reauth, but try anyway if there's a problem.
 				if (! client.isAuthenticated())
 				{
-					getScriptAppAuthentication();
+					getScriptAppAuthentication(true);
 				}
 				
 				try {

@@ -1,4 +1,4 @@
-package jmk.reddit.util;
+package jmk.reddit.weeklystats.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,12 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class AnalogBotProperties extends Properties {
+public class WeeklyStatsProperties extends Properties {
 	
 	private static final long serialVersionUID = 1L;
-	private static AnalogBotProperties props = null;
+	private static WeeklyStatsProperties props = null;
+
 	protected static final LogManager logManager = LogManager.getLogManager();
-	protected static final Logger LOG = Logger.getLogger(AnalogBotProperties.class.getName());
+	protected static final Logger LOG = Logger.getLogger(WeeklyStatsProperties.class.getName());
 
 	static
     {
@@ -25,7 +26,7 @@ public class AnalogBotProperties extends Properties {
         }
     }
 	
-	protected AnalogBotProperties() {
+	protected WeeklyStatsProperties() {
 		try {
 			this.load(new FileInputStream(new File("analogbot.properties")));
 		} catch (FileNotFoundException e) {
@@ -34,10 +35,11 @@ public class AnalogBotProperties extends Properties {
 			LOG.log(Level.SEVERE, "IO Error loading properties file", e);
 		}
 	}
-	public static synchronized AnalogBotProperties getInstance() {
+	public static synchronized WeeklyStatsProperties getInstance() {
 		if (props == null)
-			props = new AnalogBotProperties();
+			props = new WeeklyStatsProperties();
 		
 		return props;
 	}
 }
+

@@ -8,13 +8,15 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jmk.reddit.analogbot.parser.SubredditBannedParser;
 import jmk.reddit.analogbot.parser.SubredditTrafficParser;
-import jmk.reddit.util.AnalogBotBase;
+import jmk.reddit.analogbot.util.AnalogBotBase;
+import jmk.reddit.util.RedditConnector;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.CommentNode;
 import net.dean.jraw.models.Listing;
@@ -27,18 +29,19 @@ import net.dean.jraw.paginators.TimePeriod;
 
 public class AnalogBotCommands extends AnalogBotBase {
 	
-	private String GET_PHOTOS_REGEX = "^((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
-	private String GET_PHOTOS_MSG_REGEX = ".*((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
-	private String WEEKLY_STATS_REGEX = "^.*weekly[ ]?(stats|statistics).*$";
-	private String PERSONAL_STATS_REGEX = "^.*personal[ ]?(stats|statistics).*$";
+	private static final  String GET_PHOTOS_REGEX = "^((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
+	private static final  String GET_PHOTOS_MSG_REGEX = ".*((?:get|give|list|show|display|find)[\\s]*(?:me)?[\\s]*(?:the)?)[\\s]*([\\d]*)[\\s]*([a-z]*[\\s]*[a-z]*)[\\s]*([\\d]*)[\\s]*photos.*(/u/[\\w-]+).*$";
+	private static final  String WEEKLY_STATS_REGEX = "^.*weekly[ ]?(stats|statistics).*$";
+	private static final  String PERSONAL_STATS_REGEX = "^.*personal[ ]?(stats|statistics).*$";
+	private static final  String STATSTEST_REGEX = "^.*test[ ]?(stats|statistics).*(/u/[\\w-]+).*$";
 	
-	private String ae1Regex = ".*[Aa][Ee]-?1.*";
-	private String portraRegex = ".*[Pp][Oo][Rr][Tt][Rr][Aa].*";
-	private String ektarRegex = ".*[Ee][Kk][Tt][Aa][Rr].*";
-	private String tmaxRegex = ".*[Tt]-?[Mm][Aa][Xx].*";
-	private String ilfordRegex = ".*([Dd][Ee][Ll][Tt][Aa]|[Hh][Pp]5|[Ff][Pp]4|[Ii][Ll][Ff][Oo][Rr][Dd]|[Pp][Aa][Nn][ ]?[Ff]).*";
+	public static final  String ae1Regex = ".*[Aa][Ee]-?1.*";
+	public static final  String portraRegex = ".*[Pp][Oo][Rr][Tt][Rr][Aa].*";
+	public static final  String ektarRegex = ".*[Ee][Kk][Tt][Aa][Rr].*";
+	public static final  String tmaxRegex = ".*[Tt]-?[Mm][Aa][Xx].*";
+	public static final String ilfordRegex = ".*([Dd][Ee][Ll][Tt][Aa]|[Hh][Pp]5|[Ff][Pp]4|[Ii][Ll][Ff][Oo][Rr][Dd]|[Pp][Aa][Nn][ ]?[Ff]).*";
 
-	private DecimalFormat percFormat = new DecimalFormat("#.#");
+	public DecimalFormat percFormat = new DecimalFormat("#.#");
 	
 	//private RedditClient client = null;
 	private static AnalogBotCommands instance = null;
@@ -77,7 +80,6 @@ public class AnalogBotCommands extends AnalogBotBase {
 		{
 			return getPersonalStats(comment.getAuthor());
 		}
-
 		
 		String com = command.toLowerCase().trim();
 		
@@ -103,6 +105,10 @@ public class AnalogBotCommands extends AnalogBotBase {
 		else if (botCommand.matches(PERSONAL_STATS_REGEX))
 		{
 			return getPersonalStats(message.getAuthor());
+		}
+		else if (botCommand.matches(STATSTEST_REGEX))
+		{
+			return getTestPersonalStats(botCommand, STATSTEST_REGEX);			
 		}
 		else if (botCommand.matches(".*[ ]?help.*"))
 		{
@@ -261,6 +267,12 @@ public class AnalogBotCommands extends AnalogBotBase {
 		searchPaginator.setSearchSorting(sorting);
 		searchPaginator.setSubreddit(subreddit);
 		searchPaginator.setLimit(limit);
+		LOG.log(Level.INFO, "Performing search:\n"+
+				"    Query: "+searchPaginator.getQuery()+"\n"+
+				"    TimePeriod: "+searchPaginator.getTimePeriod().name()+"\n"+
+				"    Subreddit: "+searchPaginator.getSubreddit()+"\n"+
+				"    Sorting: "+searchPaginator.getSearchSorting().name()+
+				"    Limit: "+limit);
 		
 		if (timePeriod != null) searchPaginator.setTimePeriod(timePeriod);
 		searchPaginator.setSyntax(SearchSyntax.CLOUDSEARCH);
@@ -285,9 +297,14 @@ public class AnalogBotCommands extends AnalogBotBase {
 		searchPaginator.setSubreddit(subreddit);
 		searchPaginator.setTimePeriod(timePeriod);
 		searchPaginator.setSyntax(SearchSyntax.CLOUDSEARCH);
-	
+		
+		LOG.log(Level.INFO, "Performing search:\n"+
+				"    Query: "+searchPaginator.getQuery()+"\n"+
+				"    TimePeriod: "+searchPaginator.getTimePeriod().name()+"\n"+
+				"    Subreddit: "+searchPaginator.getSubreddit()+"\n"+
+				"    Sorting: "+searchPaginator.getSearchSorting().name());
 		searchPaginator.reset();
-
+		
 		Listing<Submission> list = null;
 		while (searchPaginator.hasNext()){
 			list = searchPaginator.next();
@@ -296,6 +313,7 @@ public class AnalogBotCommands extends AnalogBotBase {
 				retList.add(sub);
 			}
 		}
+		LOG.log(Level.INFO, "Search found "+retList.size()+" results:");
 		
 		return retList;
 	}
@@ -483,7 +501,19 @@ public class AnalogBotCommands extends AnalogBotBase {
 		return statPost;
 	}
 	
-	
+	private String getTestPersonalStats(String botCommand, String regex)
+	{
+		Pattern r = Pattern.compile(regex);
+		Matcher m = r.matcher(botCommand);
+		String username = "";
+		
+		if (m.find() && !isNullOrEmpty(m.group(2)) && m.group(2).startsWith("/u/"))
+		{
+			username = m.group(2).substring(3); // Cut off the "/u/" for search
+		}
+		
+		return getPersonalStats(username);
+	}
 	private String getPersonalStats(String author) 
 	{
 		

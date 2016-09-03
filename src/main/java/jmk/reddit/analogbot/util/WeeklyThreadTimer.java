@@ -1,4 +1,4 @@
-package jmk.reddit.util;
+package jmk.reddit.analogbot.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,12 +10,11 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import jmk.reddit.analogbot.AnalogBotCommands;
-import jmk.reddit.analogbot.RedditConnector;
+import jmk.reddit.util.RedditConnector;
 import net.dean.jraw.ApiException;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.managers.AccountManager;
-import net.dean.jraw.models.Submission;
 
 public class WeeklyThreadTimer extends TimerTask {
 
@@ -53,7 +52,7 @@ public class WeeklyThreadTimer extends TimerTask {
 		AccountManager account = new AccountManager(client);
 		
 		try {
-			Submission s = account.submit(builder);
+			account.submit(builder);
 			
 		} catch (NetworkException e) {
 			LOG.log(Level.SEVERE, "NetworkException when posting weekly thread", e);

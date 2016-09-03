@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Optional;
 
-import jmk.reddit.util.AnalogBotBase;
+import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.NetworkException;
 import net.dean.jraw.models.Comment;
@@ -111,7 +111,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 						try {
 							pageList = commentStream.next();
 						} catch (NetworkException ne) {
-							LOG.log(Level.SEVERE, "Re-authentication failed. Skipping this round, will try again.", ne);
+							LOG.log(Level.SEVERE, "Comment Monitor thread reports connection problem. Skipping this round, will try again.", ne);
 							utilities.changeConnectionState(false);
 							continue;
 						}

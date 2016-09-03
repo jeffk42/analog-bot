@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jmk.reddit</groupId>
 	<artifactId>analog-bot</artifactId>
-	<version>0.5.0</version>
+	<version>0.6.0</version>
 	<name>AnalogBot</name>
 	<description>A bot for the /r/analog subreddit</description>
 	<dependencies>

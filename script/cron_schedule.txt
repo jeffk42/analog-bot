@@ -1,2 +1,4 @@
 MAILTO=jeffk42@gmail.com
-0 0 * * * /usr/local/analog-bot/recyclebot.sh
+0 4 * * * /usr/local/analog-bot/recyclebot.sh
+0 0 * * 1 /usr/local/analog-bot/buildstats.sh
+0 12 * * 1 /usr/local/analog-bot/buildstats.sh poststats

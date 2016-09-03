@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import jmk.reddit.util.AnalogBotBase;
+import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.http.HttpRequest;
 import net.dean.jraw.http.NetworkException;
