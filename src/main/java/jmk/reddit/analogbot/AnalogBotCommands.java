@@ -100,7 +100,7 @@ public class AnalogBotCommands extends AnalogBotBase {
 		}
 		else if (botCommand.matches(WEEKLY_STATS_REGEX))
 		{
-			return getWeeklyStats(properties.getProperty("analog"), false);
+			return getWeeklyStats("analog", false);
 		}
 		else if (botCommand.matches(PERSONAL_STATS_REGEX))
 		{
