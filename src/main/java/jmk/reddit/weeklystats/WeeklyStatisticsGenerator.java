@@ -646,31 +646,5 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		
 		new WeeklyStatisticsGenerator(args);
 		
-//		if (args.length == 0)
-//			new WeeklyStatisticsGenerator();
-//		else if (args.length == 3 && args[0].startsWith("WeekEnding"))
-//		{
-//			
-//			new WeeklyStatisticsGenerator(args);
-//		}
-//		else
-//		{
-//			String command = "";
-//			long endBound = -1;
-//			long daysBack = -1;
-//			
-//			if (args.length > 0)
-//				command = args[0];
-//			if (args.length > 1)
-//				endBound = Long.parseLong(args[1]);
-//			if (args.length > 2)
-//				daysBack = Long.parseLong(args[2]);
-//			long startBound = -1;
-//			
-//			if (daysBack > 0)
-//				startBound = endBound - (daysBack * DAY_SECONDS);
-//			new WeeklyStatisticsGenerator(command, startBound, endBound);
-//		}
-		
 	}
 }
