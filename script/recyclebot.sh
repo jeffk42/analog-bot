@@ -1,8 +1,10 @@
 #!/bin/bash
 
 echo "Attempting to recycle the AnalogBot process..."
-source ${BASH_SOURCE%/*}/killbot.sh
+cd ${BASH_SOURCE%/*}/
+source ./killbot.sh
 sleep 2
-source ${BASH_SOURCE%/*}/startbot.sh
+source ./startbot.sh
 echo "AnalogBot recycle complete."
+cd -
 exit

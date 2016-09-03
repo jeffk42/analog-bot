@@ -27,6 +27,10 @@
 							<classpathPrefix>lib/</classpathPrefix>
 							<mainClass>jmk.reddit.analogbot.AnalogBot</mainClass>
 						</manifest>
+						<manifestEntries>
+              				<Class-Path>.</Class-Path>
+              				<Class-Path>./lib/</Class-Path>
+            			</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -37,6 +41,9 @@
 						<manifest>
 							<mainClass>jmk.reddit.analogbot.AnalogBot</mainClass>
 						</manifest>
+						<manifestEntries>
+              				<Class-Path>.</Class-Path>
+            			</manifestEntries>
 					</archive>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>

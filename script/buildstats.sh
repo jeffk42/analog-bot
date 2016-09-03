@@ -8,5 +8,7 @@ else
 fi
 
 echo "Starting WeeklyStatisticsGenerator from ${BASH_SOURCE%/*} ..."
+cd ${BASH_SOURCE%/*}/
 mkdir -p ${BASH_SOURCE%/*}/stats
-java -cp ${BASH_SOURCE%/*}/analog-bot-0.6.0-jar-with-dependencies.jar jmk.reddit.weeklystats.WeeklyStatisticsGenerator $command_name $now_date $subcommand
+java -cp ./analog-bot-0.6.0-jar-with-dependencies.jar jmk.reddit.weeklystats.WeeklyStatisticsGenerator $command_name $now_date $subcommand
+cd -
