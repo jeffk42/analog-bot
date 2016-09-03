@@ -439,63 +439,65 @@ public class AnalogBotCommands extends AnalogBotBase {
 			}
 		}
 		
-		ArrayList<String> topPostingUsers = getTopThreeUsers(userActivityMap);
-		ArrayList<String> topCommentingUsers = null;
-		
-		if (weeklyPost) topCommentingUsers = getTopThreeUsers(userCommentMap);
-		
-		int aboveAverageScore = 0;
-		int aboveAverageComments = 0;
-		
-		double avgScore = (tScore/(double) allPosts.size());
-		double avgComments = (tComments/(double) allPosts.size());
-		for (Submission s : allPosts)
+		if (allPosts.size() > 0)
 		{
-			if (s.getScore() > avgScore) {
-				aboveAverageScore++;
+			ArrayList<String> topPostingUsers = getTopThreeUsers(userActivityMap);
+			ArrayList<String> topCommentingUsers = null;
+			
+			if (weeklyPost) topCommentingUsers = getTopThreeUsers(userCommentMap);
+			
+			int aboveAverageScore = 0;
+			int aboveAverageComments = 0;
+			
+			double avgScore = (tScore/(double) allPosts.size());
+			double avgComments = (tComments/(double) allPosts.size());
+			for (Submission s : allPosts)
+			{
+				if (s.getScore() > avgScore) {
+					aboveAverageScore++;
+				}
+				
+				if (s.getCommentCount() > avgComments) {
+					aboveAverageComments++;
+				}
 			}
 			
-			if (s.getCommentCount() > avgComments) {
-				aboveAverageComments++;
-			}
-		}
-		
-		statPost += "###Vote and Comment Statistics: \n";
-		
-		statPost += "* Total Upvotes Earned: **"+ tScore + "** \n";
-		statPost += "* Average Upvotes Per Post:  **"+ Double.valueOf(new DecimalFormat("#.#").format((tScore/(double) allPosts.size()))) + 
-				"** *("+ getPercentageString(aboveAverageScore,allPosts.size()) +" of posts beat the average)* \n";
-		
-		statPost += "* Total Comments Posted: **"+ tComments + "** \n";
-		statPost += "* Average Comments Per Post: **"+ Double.valueOf(new DecimalFormat("#.#").format((tComments/(double) allPosts.size()))) + 
-				"** *("+ getPercentageString(aboveAverageComments,allPosts.size()) +" of posts beat the average)* \n";
-		
-		statPost += "* Highest Scoring Post: "+"["+topScoreSubmission.getTitle().replace("|", ":").replace("[", "(").replace("]", ")")+
-				"]("+topScoreSubmission.getShortURL()+") with a score of **"+ topScore + "**. \n\n";
-		
-		statPost += SubredditTrafficParser.getInstance().getTrafficStats(subreddit);
-		statPost += SubredditBannedParser.getInstance().getBannedStats(subreddit);
-		statPost += "\n";
-		
-		statPost += "###Most Active Posters This Week: \n";
-		
-		boolean testMode = Boolean.parseBoolean(properties.getProperty("AnalogBot.testMode"));
-		
-		for (int n = 0; n < 3; n++)
-		{
-			statPost += "* " + (testMode?"":"/u/") + topPostingUsers.get(n) + ", **" + userActivityMap.get(topPostingUsers.get(n)).intValue() + "** posts. \n";
-		}
-		
-		if (weeklyPost) {
+			statPost += "###Vote and Comment Statistics: \n";
+			
+			statPost += "* Total Upvotes Earned: **"+ tScore + "** \n";
+			statPost += "* Average Upvotes Per Post:  **"+ Double.valueOf(new DecimalFormat("#.#").format((tScore/(double) allPosts.size()))) + 
+					"** *("+ getPercentageString(aboveAverageScore,allPosts.size()) +" of posts beat the average)* \n";
+			
+			statPost += "* Total Comments Posted: **"+ tComments + "** \n";
+			statPost += "* Average Comments Per Post: **"+ Double.valueOf(new DecimalFormat("#.#").format((tComments/(double) allPosts.size()))) + 
+					"** *("+ getPercentageString(aboveAverageComments,allPosts.size()) +" of posts beat the average)* \n";
+			
+			statPost += "* Highest Scoring Post: "+"["+topScoreSubmission.getTitle().replace("|", ":").replace("[", "(").replace("]", ")")+
+					"]("+topScoreSubmission.getShortURL()+") with a score of **"+ topScore + "**. \n\n";
+			
+			statPost += SubredditTrafficParser.getInstance().getTrafficStats(subreddit);
+			statPost += SubredditBannedParser.getInstance().getBannedStats(subreddit);
 			statPost += "\n";
-			statPost += "###Most Active Commenters This Week: \n";
+			
+			statPost += "###Most Active Posters This Week: \n";
+			
+			boolean testMode = Boolean.parseBoolean(properties.getProperty("AnalogBot.testMode"));
+			
 			for (int n = 0; n < 3; n++)
 			{
-				if (topCommentingUsers.size() > n)
-					statPost += "* " + (testMode?"":"/u/") + topCommentingUsers.get(n) + ", **" + userCommentMap.get(topCommentingUsers.get(n)).intValue() + "** comments. \n";
+				statPost += "* " + (testMode?"":"/u/") + topPostingUsers.get(n) + ", **" + userActivityMap.get(topPostingUsers.get(n)).intValue() + "** posts. \n";
+			}
+			
+			if (weeklyPost) {
+				statPost += "\n";
+				statPost += "###Most Active Commenters This Week: \n";
+				for (int n = 0; n < 3; n++)
+				{
+					if (topCommentingUsers.size() > n)
+						statPost += "* " + (testMode?"":"/u/") + topCommentingUsers.get(n) + ", **" + userCommentMap.get(topCommentingUsers.get(n)).intValue() + "** comments. \n";
+				}
 			}
 		}
-		
 		statPost += "\n&nbsp;\n\n*^^bleep, ^^bloop*";
 		
 		return statPost;
