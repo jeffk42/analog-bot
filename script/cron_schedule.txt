@@ -1,4 +1,4 @@
 MAILTO=jeffk42@gmail.com
 0 4 * * * /home/ec2-user/installation/analog-bot/recyclebot.sh
-0 0 * * 1 /home/ec2-user/installation/analog-bot/buildstats.sh WeeklyStats `date -j -v -Sunday +%m%d%y` BuildStats
+0 0 * * 1 /home/ec2-user/installation/analog-bot/buildstats.sh WeekEnding `date -j -v -Sunday +%m%d%y` BuildStats
 0 12 * * 1 /home/ec2-user/installation/analog-bot/buildstats.sh PostStats
