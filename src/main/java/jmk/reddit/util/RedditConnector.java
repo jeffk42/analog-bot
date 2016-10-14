@@ -46,6 +46,7 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 	public static synchronized RedditConnector getInstance() {
 		if (instance == null)
 		{
+			LOG.info("Creating a new RedditConnector...");
 			instance = new RedditConnector();	
 		}
 		
@@ -59,9 +60,9 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 		try {
 			authData = client.getOAuthHelper().easyAuth(credentials);
 		} catch (NetworkException e) {
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "Encountered error while authenticating.", e);
 		} catch (OAuthException e) {
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "Encountered error while authenticating.", e);
 		}
 		
 		if (authData != null) 
@@ -72,6 +73,35 @@ public class RedditConnector extends AnalogBotBase implements Runnable {
 			utilities.changeConnectionState(true);
 		}
 
+		return client;
+	}
+	
+	public RedditClient tryUntilAuthenticated(boolean updateStatus)
+	{
+		int tries = 0;
+		String message = "";
+		LOG.log(Level.INFO, "Attempting authentication, current connection status is: "+client.isAuthenticated());
+		
+		while (!client.isAuthenticated() && (tries < 90))
+		{
+			tries++;
+			message = "One-time authentication attempt #"+tries;
+			client = getScriptAppAuthentication(updateStatus);
+			if (!client.isAuthenticated())
+			{
+				LOG.log(Level.WARNING, message+ " failed. Will re-attempt in 2 minutes.");
+				try {
+					Thread.sleep(120000);
+				} catch (InterruptedException e) {
+					LOG.log(Level.SEVERE, "Error during thread sleep.", e);
+				}
+			}
+			else
+				LOG.log(Level.INFO, message+" succeeded.");
+		}
+		
+		if (!client.isAuthenticated() && (tries >= 90))
+			LOG.log(Level.SEVERE, "Maximum retries has been reached. Authentication failure.");
 		return client;
 	}
 	

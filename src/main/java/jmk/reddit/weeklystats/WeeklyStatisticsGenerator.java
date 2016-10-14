@@ -58,80 +58,88 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	public WeeklyStatisticsGenerator(String [] args)
 	{		
 		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
+		client = RedditConnector.getInstance().tryUntilAuthenticated(false);
 		
-		if (args.length > 0)
+		if (client != null && client.isAuthenticated())
 		{
-			if (args[0].equalsIgnoreCase("WeekEnding"))
+			if (args.length > 0)
 			{
-				if (args.length > 1)
+				if (args[0].equalsIgnoreCase("WeekEnding"))
 				{
-					// argument should be in the format mmddyy
-					// ie, bash comand `date -j +%m%d%y`
-					int month = Integer.parseInt(args[1].substring(0,2));
-					int day = Integer.parseInt(args[1].substring(2,4));
-					int year = Integer.parseInt(args[1].substring(4));
-					
-					Calendar calEnd = Calendar.getInstance();
-					calEnd.set(2000 + year, month-1, day, 23, 59, 59);
-					calEnd.setTimeZone(TimeZone.getTimeZone("GMT"));
-					
-					Calendar calStart = Calendar.getInstance();
-					calStart.setTime(calEnd.getTime());
-					calStart.setTimeZone(TimeZone.getTimeZone("GMT"));
-					
-					calStart.add(Calendar.DAY_OF_MONTH, -6);
-					calStart.set(Calendar.HOUR_OF_DAY, 00);
-					calStart.set(Calendar.MINUTE, 00);
-					calStart.set(Calendar.SECOND, 00);
-					
-					LOG.log(Level.INFO, "Generating statistics from "+calStart.getTime().toString()+" to "+
-					calEnd.getTime().toString()+ "...");
-					
-					long fromTime = calStart.getTimeInMillis() / 1000;
-					long toTime = calEnd.getTimeInMillis() / 1000;
-					
-					fromTime += (searchTimeOffset * HOUR_SECONDS);
-					toTime += (searchTimeOffset * HOUR_SECONDS);
-					
-					generateStatsFile(fromTime, toTime);
-					
+					if (args.length > 1)
+					{
+						// argument should be in the format mmddyy
+						// ie, bash comand `date -j +%m%d%y`
+						int month = Integer.parseInt(args[1].substring(0,2));
+						int day = Integer.parseInt(args[1].substring(2,4));
+						int year = Integer.parseInt(args[1].substring(4));
+						
+						Calendar calEnd = Calendar.getInstance();
+						calEnd.set(2000 + year, month-1, day, 23, 59, 59);
+						calEnd.setTimeZone(TimeZone.getTimeZone("GMT"));
+						
+						Calendar calStart = Calendar.getInstance();
+						calStart.setTime(calEnd.getTime());
+						calStart.setTimeZone(TimeZone.getTimeZone("GMT"));
+						
+						calStart.add(Calendar.DAY_OF_MONTH, -6);
+						calStart.set(Calendar.HOUR_OF_DAY, 00);
+						calStart.set(Calendar.MINUTE, 00);
+						calStart.set(Calendar.SECOND, 00);
+						
+						LOG.log(Level.INFO, "Generating statistics from "+calStart.getTime().toString()+" to "+
+						calEnd.getTime().toString()+ "...");
+						
+						long fromTime = calStart.getTimeInMillis() / 1000;
+						long toTime = calEnd.getTimeInMillis() / 1000;
+						
+						fromTime += (searchTimeOffset * HOUR_SECONDS);
+						toTime += (searchTimeOffset * HOUR_SECONDS);
+						
+						generateStatsFile(fromTime, toTime);
+						
+						if (args.length > 2)
+						{
+							if (args[2].equalsIgnoreCase("BuildAndPostStats"))
+							{
+								postStatsFromFile();
+							}
+						}
+						
+						
+					}
+					else LOG.log(Level.SEVERE, "WeekEnding Requires a date in MMDDYY format and a processing command to continue.");
+				}
+				else if (args[0].equalsIgnoreCase("TimeRange"))
+				{
 					if (args.length > 2)
 					{
-						if (args[2].equalsIgnoreCase("BuildAndPostStats"))
+						long fromTime = Long.parseLong(args[1]);
+						long toTime = Long.parseLong(args[2]);
+						
+						fromTime += (searchTimeOffset * HOUR_SECONDS);
+						toTime += (searchTimeOffset * HOUR_SECONDS);
+						
+						generateStatsFile(fromTime, toTime);
+						
+						if (args.length > 3)
 						{
-							postStatsFromFile();
+							if (args[3].equalsIgnoreCase("BuildAndPostStats"))
+							{
+								postStatsFromFile();
+							}
 						}
 					}
-					
-					
 				}
-				else LOG.log(Level.SEVERE, "WeekEnding Requires a date in MMDDYY format and a processing command to continue.");
-			}
-			else if (args[0].equalsIgnoreCase("TimeRange"))
-			{
-				if (args.length > 2)
+				else if (args[0].equalsIgnoreCase("PostStats"))
 				{
-					long fromTime = Long.parseLong(args[1]);
-					long toTime = Long.parseLong(args[2]);
-					
-					fromTime += (searchTimeOffset * HOUR_SECONDS);
-					toTime += (searchTimeOffset * HOUR_SECONDS);
-					
-					generateStatsFile(fromTime, toTime);
-					
-					if (args.length > 3)
-					{
-						if (args[3].equalsIgnoreCase("BuildAndPostStats"))
-						{
-							postStatsFromFile();
-						}
-					}
+					postStatsFromFile();
 				}
 			}
-			else if (args[0].equalsIgnoreCase("PostStats"))
-			{
-				postStatsFromFile();
-			}
+		}
+		else
+		{
+			LOG.warning("Client returned from RedditConnector is null or not authenticated. This shouldn't happen, but it did, so goodbye.");
 		}
 	
 	}
@@ -153,8 +161,6 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 //	}
 	
 	public void generateStatsFile(long fromTime, long toTime) {
-		
-		client = RedditConnector.getInstance().getScriptAppAuthentication(false);
 		
 		if (client.isAuthenticated()) 
 		{			
@@ -205,31 +211,39 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		String post = "";
 		String title = "";
 		
-		try {
-			
-			FileReader fileReader = new FileReader(inputFile);
-
-            // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line = "";
-            
-            
-            // First line is the post title.
-            if ((line = bufferedReader.readLine()) != null)
-            	title = line;
-            	
-            while((line = bufferedReader.readLine()) != null) {
-                post += line + "\n";
-            }   
-
-            // Always close files.
-            bufferedReader.close();         
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}	
-		LOG.log(Level.INFO, "Posting: "+title);
-		selfPost(title, post, properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
+		if (client.isAuthenticated())
+		{
+		
+			try {
+				
+				FileReader fileReader = new FileReader(inputFile);
+	
+	            // Always wrap FileReader in BufferedReader.
+	            BufferedReader bufferedReader = new BufferedReader(fileReader);
+	            String line = "";
+	            
+	            
+	            // First line is the post title.
+	            if ((line = bufferedReader.readLine()) != null)
+	            	title = line;
+	            	
+	            while((line = bufferedReader.readLine()) != null) {
+	                post += line + "\n";
+	            }   
+	
+	            // Always close files.
+	            bufferedReader.close();         
+	
+			} catch (Exception ex) {
+				LOG.log(Level.WARNING,"Post Stats encountered an error: ",ex);
+			}	
+			LOG.log(Level.INFO, "Posting: "+title);
+			selfPost(title, post, properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
+		}
+		else
+		{
+			LOG.warning("postStatsFromFile() reports client is not authenticated!");
+		}
 	}
 	
 	/**
@@ -285,9 +299,9 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		statPost += "#Weekly Statistics For /r/"+subreddit+": \n\n";
 		
 
-		statPost += "This post is a collection of stats for /r/"+subreddit+" for the previous week."+
-				" It's a new thing, compiled by [AnalogBot](https://www.reddit.com/r/analog/wiki/analogbot), that we're trying out for a couple of weeks. "+
-				" We'd love to know what you think. Like it? Hate it? Have a suggestion for new stats? Leave a comment!\n\n&nbsp;\n";
+		statPost += "This post is a collection of statistics for /r/"+subreddit+" for the previous week. "+
+				"Stats are compiled by [AnalogBot](https://www.reddit.com/r/analog/wiki/analogbot). "+
+				"**Please send bug reports or feature/statistic requests to /u/jeffk42.**\n\n";
 
 		
 		statPost += "###Post Statistics: \n";
@@ -433,7 +447,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		}
 		
 		statPost += "\n&nbsp;\n\n*^^bleep, ^^bloop*";
-		
+		statPost += "\n\n--------------\n\nSee [Previous Stats Posts](https://www.reddit.com/r/analog/search?sort=new&q=%28and+author:%27AnalogBot%27+self:1+title:%27Week%20Ending%27+subreddit:%27analog%27%29&syntax=cloudsearch)";
 		return statPost;
 	}
 	
@@ -652,6 +666,13 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
                 LOG.info("Connection closed.");
             }
         });
+		String startupMsg = "Starting the WeeklyStatisticsGenerator:\n";
+		
+		if (args != null)
+			for (String arg : args)
+				startupMsg += "-- "+arg+"\n";
+				
+		LOG.info(startupMsg);
 		
 		new WeeklyStatisticsGenerator(args);
 		
