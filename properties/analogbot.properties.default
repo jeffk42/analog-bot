@@ -12,9 +12,6 @@ AnalogBot.enableCommentMonitor=false
 ### enable the thread that monitors the account's messages for private commands. ###
 AnalogBot.enableMessageMonitor=false
 
-### enable the thread that monitors for POTW posts. ###
-AnalogBot.enablePotwMonitor=false
-
 ### enables the thread that posts the weekly post. ###
 # Note: this does not affect direct calls to the WeeklyStatisticsGenerator, only if you choose to let AnalogBot handle it. #
 AnalogBot.enableWeeklyPost=false
@@ -37,8 +34,8 @@ AnalogBot.CommentMonitor.callString=
 ### List of subreddits that the bot should listen to for commands. ###
 AnalogBot.CommentMonitor.subredditsToMonitor=
 
-### List of subreddits that the bot should listen to for POTW posts. ###
-AnalogBot.PotwMonitor.subredditsToMonitor=
+### Enable POTW winner selection via private message (note: this also requires the MessageMonitor to be enabled.) ###
+AnalogBot.MessageMonitor.enablePotwMessages=false
 
 ### The subreddit that the weekly stats post should be posted to ###
 AnalogBot.WeeklyPost.subreddit=
@@ -63,6 +60,8 @@ AnalogBot.WeeklyPost.searchTimeOffset=8
 ### Weekly Stats Filename ###
 AnalogBot.WeeklyPost.outputFileName=./stats/weeklystats.txt
 
+### POTW Winner Interview Message Template Filename ###
+AnalogBot.PotwTemplateFilename=./potw/potwTemplate.txt
 
 ### Meaningless Drivel ###
 AnalogBot.adjectives=stinky,fun,round,local,portly,dull,rare,awful,slippery,funky,brown,angry

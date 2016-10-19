@@ -57,18 +57,17 @@ public class AnalogBot extends AnalogBotBase {
 		inbox = new InboxManager(RedditConnector.getInstance().getClient());
 		commandUtil = AnalogBotCommands.getInstance();
 	
-		// spawn threads for each of the primary functions
+		// spawn threads for each of the primary functions, if enabled.
 		startCommentListenerThreads();
 		startMessageListenerThread();
 		startWeeklyPostThread();
 		
-		//postWeeklyNow();
 		
 		
 		LOG.info("Process started"+(Boolean.getBoolean(this.getProperties().getProperty("AnalogBot.testMode"))?" in test mode.":"."));
 	}
 	
-	
+	/** Test method to auto-post the weekly stats on startup. */
 	private void postWeeklyNow() {
 		Calendar date1 = Calendar.getInstance();
 		date1.add(Calendar.DATE, -1);
@@ -79,6 +78,7 @@ public class AnalogBot extends AnalogBotBase {
 				", Week Ending " + dt1.format(date1.getTime()), postContent, 
 				properties.getProperty("AnalogBot.WeeklyPost.subreddit"));
 	}
+	
 	/**
 	 * This method creates a thread for each subreddit that we're listening to, for the purpose
 	 * of monitoring incoming comments.
@@ -93,8 +93,8 @@ public class AnalogBot extends AnalogBotBase {
 				String[] subList = listenSubs.split(",");
 				for (String subreddit : subList)
 				{
-					Thread commentStreamThread = new Thread(new CommentStreamMonitor(this, RedditConnector.getInstance().getClient(), subreddit), "CommentMonitor_"+subreddit);
-					LOG.info("Firing up the Comment Monitor thread for /r/"+subreddit);
+					Thread commentStreamThread = new Thread(new CommentStreamMonitor(this, RedditConnector.getInstance().getClient(), subreddit.trim()), "CommentMonitor_"+subreddit.trim());
+					LOG.info("Firing up the Comment Monitor thread for /r/"+subreddit.trim());
 					commentStreamThread.start();
 				}
 			}
@@ -132,6 +132,11 @@ public class AnalogBot extends AnalogBotBase {
 		authStreamThread.start();
 	}
 	
+	/**
+	 * Starts the thread that generates a weekly stats post.
+	 * @deprecated Use WeeklyStatisticsGenerator in a cron job
+	 */
+	@Deprecated
 	private void startWeeklyPostThread() {
 		if (Boolean.parseBoolean(properties.getProperty("AnalogBot.enableWeeklyPost"))) {
 			Calendar date1 = Calendar.getInstance();
@@ -268,6 +273,34 @@ public class AnalogBot extends AnalogBotBase {
 		replyToMessage(message, commandUtil.parseMessage(message));
 	}
 
+
+	/**
+	 * @return the account
+	 */
+	public AccountManager getAccount() {
+		return account;
+	}
+
+	/**
+	 * @param account the account to set
+	 */
+	public void setAccount(AccountManager account) {
+		this.account = account;
+	}
+
+	/**
+	 * @return the inbox
+	 */
+	public InboxManager getInbox() {
+		return inbox;
+	}
+
+	/**
+	 * @param inbox the inbox to set
+	 */
+	public void setInbox(InboxManager inbox) {
+		this.inbox = inbox;
+	}
 
 	/**
 	 * @param args

@@ -30,12 +30,13 @@ import net.dean.jraw.paginators.TimePeriod;
  */
 public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 	
-	RedditClient client = null;
-	String subreddit = null;
-	CommentStream commentStream = null;
-	AnalogBot parent = null;
+	protected RedditClient client = null;
+	protected String subreddit = null;
+	protected CommentStream commentStream = null;
+	protected AnalogBot parent = null;
     private static final Logger LOG = Logger.getLogger(CommentStreamMonitor.class.getName());
-    private String[] ignoredUsers = null;
+    protected String[] ignoredUsers = null;
+    protected String LISTENER_REGEX = null; 
 
 
 	public CommentStreamMonitor(AnalogBot parent, RedditClient client, String subreddit) {
@@ -45,9 +46,10 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 		this.commentStream = new CommentStream(client, subreddit);
 		this.parent = parent;
 		ignoredUsers = parent.getProperties().getProperty("AnalogBot.ignoredUsers").split(",");
+		LISTENER_REGEX = parent.COMMENT_LISTENER_REGEX;
 	}
 	
-	private boolean isCommentAuthoredBy(Comment c, String user)
+	protected boolean isCommentAuthoredBy(Comment c, String user)
 	{
 		return c.getAuthor().equalsIgnoreCase(user);
 	}
@@ -58,7 +60,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 	 * @param user
 	 * @return
 	 */
-	private boolean isCommentRepliedBy(Comment c, String user)
+	protected boolean isCommentRepliedBy(Comment c, String user)
 	{
 		
 		Submission sub = client.getSubmission(c.getSubmissionId().substring(c.getSubmissionId().lastIndexOf("_")+1));
@@ -77,7 +79,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 		return false;
 	}
 	
-	private boolean isUserIgnored(String user) {
+	protected boolean isUserIgnored(String user) {
 		for (String ig : ignoredUsers)
 		{
 			if (ig.trim().equals("user"))
@@ -128,7 +130,7 @@ public class CommentStreamMonitor extends AnalogBotBase implements Runnable {
 								break;
 							
 							
-							Pattern r = Pattern.compile(parent.COMMENT_LISTENER_REGEX, Pattern.MULTILINE);
+							Pattern r = Pattern.compile(LISTENER_REGEX, Pattern.MULTILINE);
 							
 							Matcher m = r.matcher(c.getBody());
 

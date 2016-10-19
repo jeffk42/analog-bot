@@ -48,15 +48,9 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	
 	public DecimalFormat percFormat = new DecimalFormat("#.#");
 	
-//	public WeeklyStatisticsGenerator() {
-//		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
-//		long toTime = (System.currentTimeMillis() / 1000) + (searchTimeOffset * HOUR_SECONDS);
-//		long fromTime = toTime - WEEK_SECONDS;
-//		generateStatsFile(fromTime, toTime);
-//	}
-	
 	public WeeklyStatisticsGenerator(String [] args)
 	{		
+		// See config file for description. This is a weird one.
 		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
 		client = RedditConnector.getInstance().tryUntilAuthenticated(false);
 		
@@ -93,10 +87,11 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 						long fromTime = calStart.getTimeInMillis() / 1000;
 						long toTime = calEnd.getTimeInMillis() / 1000;
 						
-						fromTime += (searchTimeOffset * HOUR_SECONDS);
-						toTime += (searchTimeOffset * HOUR_SECONDS);
+						//This is affecting the actual search results.
+//						fromTime += (searchTimeOffset * HOUR_SECONDS);
+//						toTime += (searchTimeOffset * HOUR_SECONDS);
 						
-						generateStatsFile(fromTime, toTime);
+						generateStatsFile(fromTime, toTime, (searchTimeOffset * HOUR_SECONDS));
 						
 						if (args.length > 2)
 						{
@@ -117,10 +112,10 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 						long fromTime = Long.parseLong(args[1]);
 						long toTime = Long.parseLong(args[2]);
 						
-						fromTime += (searchTimeOffset * HOUR_SECONDS);
-						toTime += (searchTimeOffset * HOUR_SECONDS);
+//						fromTime += (searchTimeOffset * HOUR_SECONDS);
+//						toTime += (searchTimeOffset * HOUR_SECONDS);
 						
-						generateStatsFile(fromTime, toTime);
+						generateStatsFile(fromTime, toTime, (searchTimeOffset * HOUR_SECONDS));
 						
 						if (args.length > 3)
 						{
@@ -144,23 +139,8 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	
 	}
 	
-//	public WeeklyStatisticsGenerator(String command, long fromTime, long toTime) {
-//		long searchTimeOffset = Long.parseLong(properties.getProperty("AnalogBot.WeeklyPost.searchTimeOffset"));
-//		fromTime += (searchTimeOffset * HOUR_SECONDS);
-//		toTime += (searchTimeOffset * HOUR_SECONDS);
-//		
-//		if (command.equalsIgnoreCase("BuildStats"))
-//			generateStatsFile(fromTime, toTime);
-//		else if (command.equalsIgnoreCase("PostStats"))
-//			postStatsFromFile();
-//		else if (command.equalsIgnoreCase("BuildAndPostStats"))
-//		{
-//			generateStatsFile(fromTime, toTime);
-//			postStatsFromFile();
-//		}
-//	}
 	
-	public void generateStatsFile(long fromTime, long toTime) {
+	public void generateStatsFile(long fromTime, long toTime, long searchTimeOffset) {
 		
 		if (client.isAuthenticated()) 
 		{			
@@ -187,7 +167,7 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 				
 				String weeklyPostString = getWeeklyStats(
 						properties.getProperty("AnalogBot.WeeklyPost.subreddit"),
-						fromTime, toTime);
+						fromTime, toTime, searchTimeOffset);
 				osTime.write(weeklyPostString.getBytes());
 				
 				osTime.flush();
@@ -279,8 +259,11 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 	 * to compile.
 	 * @return
 	 */
-	public String getWeeklyStats(String subreddit, long fromTime, long toTime) {
+	public String getWeeklyStats(String subreddit, long fromTime, long toTime, long searchTimeOffset) {
 		String statPost = "";
+		
+		fromTime += searchTimeOffset;
+		toTime += searchTimeOffset;
 		
 		ArrayList<Submission> textPosts = postSearch(subreddit, SearchSort.NEW, 
 				null,"(and timestamp:"+fromTime+".."+toTime+" self:1)");

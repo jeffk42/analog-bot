@@ -6,6 +6,7 @@ package jmk.reddit.analogbot;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jmk.reddit.analogbot.potw.PotwMessageHandler;
 import jmk.reddit.analogbot.util.AnalogBotBase;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.models.Listing;
@@ -37,13 +38,22 @@ public class MessageMonitor extends AnalogBotBase implements Runnable {
 	
 	private boolean handleUnreadMessage(Message m)
 	{
-		try
+		if (m.getSubject().contains("POTW Interview Request:") || m.getSubject().contains("Please Confirm Your Selection"))
 		{
-			parent.handleMessageRequest(m);
-		} catch (Exception ex) {
-			LOG.log(Level.SEVERE, "Error during handle message request.", ex);
-			return false;
+			PotwMessageHandler.handlePotwMessage(m, parent);
+			parent.getInbox().setRead(true, m);
 		}
+		else
+		{
+			try
+			{
+				parent.handleMessageRequest(m);
+			} catch (Exception ex) {
+				LOG.log(Level.SEVERE, "Error during handle message request.", ex);
+				return false;
+			}
+		}
+
 		return true;
 	}
 
