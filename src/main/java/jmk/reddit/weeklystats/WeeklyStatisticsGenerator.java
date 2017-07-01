@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStream;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -265,17 +267,87 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		fromTime += searchTimeOffset;
 		toTime += searchTimeOffset;
 		
-		ArrayList<Submission> textPosts = postSearch(subreddit, SearchSort.NEW, 
-				null,"(and timestamp:"+fromTime+".."+toTime+" self:1)");
-		ArrayList<Submission> linkPosts = postSearch(subreddit, SearchSort.NEW, 
-				null,"(and timestamp:"+fromTime+".."+toTime+" self:0)");
+//		ArrayList<Submission> textPosts = postSearch(subreddit, SearchSort.NEW, 
+//				null,"(and timestamp:"+fromTime+".."+toTime+" self:1)");
+//		ArrayList<Submission> linkPosts = postSearch(subreddit, SearchSort.NEW, 
+//				null,"(and timestamp:"+fromTime+".."+toTime+" self:0)");
+		
+		ArrayList<Submission> textPosts = segmentedPostSearch(subreddit, SearchSort.NEW, 
+				null, fromTime, toTime, "self:1");
+		ArrayList<Submission> linkPosts = segmentedPostSearch(subreddit, SearchSort.NEW, 
+				null, fromTime, toTime, "self:0");
+		
 		ArrayList<Submission> allPosts = new ArrayList<Submission>();
-		LOG.info("Found "+textPosts.size()+" self posts and "+linkPosts.size()+" link posts. Retrieving link post comments...");
-		for (Submission s : linkPosts)
-			allPosts.add(RedditConnector.getInstance().getClient().getSubmission(s.getId()));
-		LOG.info("Retrieving text post comments...");
+		LOG.info("Found "+textPosts.size()+" self posts and "+linkPosts.size()+" link posts. Retrieving text post comments...");
+		
+		int tries = 0;
+		boolean success = false;
+		Submission fullSub = null;
 		for (Submission s : textPosts)
-			allPosts.add(RedditConnector.getInstance().getClient().getSubmission(s.getId()));
+		{
+			fullSub = null;
+			tries = 0;
+			success = false;
+			
+			while ((tries < 10) && !success)
+			{
+				try {
+					tries++;
+					fullSub = RedditConnector.getInstance().getClient().getSubmission(s.getId());
+					
+					if (fullSub != null && !fullSub.getId().isEmpty())
+					{
+						allPosts.add(fullSub);
+						success = true;
+						//LOG.log(Level.INFO, "Added textPost "+s.getId()+" to allPosts. New size is "+allPosts.size());
+					}
+					else
+					{
+						LOG.log(Level.WARNING, "Retrieve failed. Retrying.");
+						success = false;
+					}
+					
+					
+				} catch (Exception e) {
+					LOG.log(Level.WARNING, "Submission retrieval failed, retrying attempt #"+tries+"...");
+					success = false;
+				}
+			}
+		}
+		
+		LOG.info("Retrieving link post comments...");
+		for (Submission s : linkPosts)
+		{
+			tries = 0;
+			success = false;
+			fullSub = null;
+			while ((tries < 10) && !success)
+			{
+				try {
+					tries++;
+					fullSub = RedditConnector.getInstance().getClient().getSubmission(s.getId());
+					
+					if (fullSub != null && !fullSub.getId().isEmpty())
+					{
+						allPosts.add(fullSub);
+						success = true;
+						//LOG.log(Level.INFO, "Added linkPost "+s.getId()+" to allPosts. New size is "+allPosts.size());
+					}
+					else
+					{
+						LOG.log(Level.WARNING, "Retrieve failed. Retrying.");
+						success = false;
+					}
+				} catch (Exception e) {
+					LOG.log(Level.WARNING, "Submission retrieval failed, retrying attempt #"+tries+"...");
+					success = false;
+				}
+			}
+			
+		}
+		
+		
+		
 		
 		
 		// Rather than search again, just look at the current results.
@@ -631,6 +703,62 @@ public class WeeklyStatisticsGenerator extends WeeklyStatsBase {
 		}
 		
 		return retList;
+	}
+	
+	public ArrayList<Submission> segmentedPostSearch(String subreddit, SearchSort sort, TimePeriod timePeriod, long fromTime, long toTime, String otherQuery)
+	{
+		// timestamp:"+fromTime+".."+toTime+
+		ArrayList<Submission> fullList = new ArrayList<Submission>();
+		
+		// Break up into slices to search smaller windows of time.
+		long timeSlice = (toTime - fromTime) / 14;
+		long localFromTime = -1;
+		long localToTime = -1;
+		
+		localFromTime = fromTime;
+		localToTime = fromTime + timeSlice;
+		
+		ArrayList<Submission> searchSlice = new ArrayList<Submission>();
+		int round = 1;
+		
+		while (localToTime <= toTime)
+		{
+			LOG.log(Level.INFO, "Searching segment #"+round);
+			boolean success = false;
+			while (!success)
+			{
+				try {
+					searchSlice = postSearch(subreddit, sort, timePeriod, "(and timestamp:"+localFromTime+".."+localToTime+" "+ otherQuery + ")");
+					success = true;
+				} catch (Exception ex)
+				{
+					success = false;
+					LOG.log(Level.WARNING, "Search failed, retrying...");
+				}
+			}
+			
+			localFromTime = localToTime + 1;
+			localToTime = localToTime + timeSlice;
+			LOG.log(Level.INFO, "searchSlice #"+round+" has "+searchSlice.size()+ " entries.");
+			round++;
+			
+			for (Submission sub : searchSlice)
+			{
+				boolean copyFlag = false;
+				int fullListSize = fullList.size();
+				int iter = 0;
+				while ((iter < fullListSize) && !copyFlag)
+				{
+					copyFlag = (fullList.get(iter).getId().equals(sub.getId()));
+					iter++;
+				}
+				
+				if (!copyFlag) fullList.add(sub);
+			}
+			
+		}
+		
+		return fullList;
 	}
 	
 	

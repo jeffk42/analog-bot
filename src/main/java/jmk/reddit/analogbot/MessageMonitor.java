@@ -38,7 +38,9 @@ public class MessageMonitor extends AnalogBotBase implements Runnable {
 	
 	private boolean handleUnreadMessage(Message m)
 	{
-		if (m.getSubject().contains("POTW Interview Request:") || m.getSubject().contains("Please Confirm Your Selection"))
+		if (Boolean.parseBoolean(properties.getProperty("AnalogBot.MessageMonitor.enablePotwMessages")) && 
+				(m.getSubject().contains(PotwMessageHandler.POTW_WINNER_SELECT_SUBJECT_TEXT) || 
+				 m.getSubject().contains(PotwMessageHandler.CONFIRMATION_SUBJECT_TEXT)))
 		{
 			PotwMessageHandler.handlePotwMessage(m, parent);
 			parent.getInbox().setRead(true, m);
